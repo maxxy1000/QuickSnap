@@ -24,7 +24,7 @@ namespace CardGames.GameLogic
 		private readonly Timer _gameTimer;
 
 		// The amount of time that must pass before a card is flipped?
-		private int _flipTime = 1000;
+		private int _flipTime = 300;
 
 		// the score for the 2 players
 		private int[] _score = new int[2];
@@ -37,6 +37,7 @@ namespace CardGames.GameLogic
 		public Snap ()
 		{
 			_deck = new Deck ();
+            _gameTimer = SwinGame.CreateTimer();
 		}
 
 		/// <summary>
@@ -92,6 +93,7 @@ namespace CardGames.GameLogic
 				_deck.Shuffle ();		// Return the cards and shuffle
 
 				FlipNextCard ();		// Flip the first card...
+                _gameTimer.Start();
 			}
 		}
 			
@@ -111,7 +113,11 @@ namespace CardGames.GameLogic
 		/// </summary>
 		public void Update()
 		{
-			//TODO: implement update to automatically slip cards!
+			if (_gameTimer.Ticks > _flipTime)
+            {
+                _gameTimer.Reset();
+                FlipNextCard();
+            }
 		}
 
 		/// <summary>
@@ -140,9 +146,14 @@ namespace CardGames.GameLogic
 				_score[player]++;
 				//TODO: consider playing a sound here...
 			}
+            else if (player >= 0 && player < _score.Length)
+            {
+                _score[player]--;
+            }
 
 			// stop the game...
 			_started = false;
+            _gameTimer.Stop();
 		}
 	
 		#region Snap Game Unit Tests
